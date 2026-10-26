@@ -33,7 +33,7 @@ jobs:
   validate:
     # The archived sunset tag was assembled separately; future tags are Electron-only.
     if: github.event_name == 'workflow_dispatch' || github.ref_name != vars.TAURI_SUNSET_TAG
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
@@ -61,7 +61,7 @@ jobs:
           test "$(git rev-parse HEAD)" = "$(git rev-parse "$REF^{commit}")" || { echo "Checkout does not match the release tag"; exit 1; }
   package:
     needs: validate
-    runs-on: ${{ matrix.runner }}
+    runs-on: "${{ (matrix.runner) == 'ubuntu-24.04' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (matrix.runner) == 'windows-2022' && fromJSON('[\"self-hosted\",\"windows\",\"x64\"]') || (matrix.runner) == 'windows-11-arm' && fromJSON('[\"self-hosted\",\"windows\",\"ARM64\"]') || (matrix.runner) == 'macos-15' && fromJSON('[\"self-hosted\",\"macOS\",\"ARM64\"]') || (matrix.runner) == 'macos-15-intel' && fromJSON('[\"self-hosted\",\"macOS\",\"x64\"]') || (matrix.runner) }}"
     timeout-minutes: 60
     continue-on-error: ${{ matrix.experimental == true }}
     strategy:
@@ -221,7 +221,7 @@ jobs:
 
   release:
     needs: package
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     permissions:
       contents: write
       # Dispatch docker.yml after publishing: GITHUB_TOKEN releases fire no `release` event.

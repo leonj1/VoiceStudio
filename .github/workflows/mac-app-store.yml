@@ -17,7 +17,7 @@ env:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -28,7 +28,7 @@ jobs:
 
   package:
     needs: validate
-    runs-on: ${{ matrix.runner }}
+    runs-on: "${{ (matrix.runner) == 'macos-15' && fromJSON('[\"self-hosted\",\"macOS\",\"ARM64\"]') || (matrix.runner) == 'macos-15-intel' && fromJSON('[\"self-hosted\",\"macOS\",\"x64\"]') || (matrix.runner) }}"
     timeout-minutes: 75
     strategy:
       fail-fast: false

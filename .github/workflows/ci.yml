@@ -20,7 +20,7 @@ env:
 jobs:
   installer:
     name: Electron installer contracts
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -47,7 +47,7 @@ jobs:
 
   test:
     name: Tests (backend + frontend)
-    runs-on: ubuntu-22.04
+    runs-on: [self-hosted, linux, x64]
     env:
       # Same restricted-network resilience the smoke matrix already sets. This
       # job resolves the same direct-URL dependency and had none of it, which
@@ -192,7 +192,7 @@ jobs:
 
   linux-native-package:
     name: Linux native package
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -221,7 +221,7 @@ jobs:
   # installers are covered separately by packaged-smoke.mjs on release paths.
   electron-ui:
     name: Desktop UI (${{ matrix.label }})
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ (matrix.os) == 'macos-15' && fromJSON('[\"self-hosted\",\"macOS\",\"ARM64\"]') || (matrix.os) == 'windows-2022' && fromJSON('[\"self-hosted\",\"windows\",\"x64\"]') || (matrix.os) == 'ubuntu-24.04' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (matrix.os) }}"
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -315,7 +315,7 @@ jobs:
           - os: ubuntu-22.04
             label: Linux
             backend_supported: true
-    runs-on: ${{ matrix.os }}
+    runs-on: "${{ (matrix.os) == 'macos-14' && fromJSON('[\"self-hosted\",\"macOS\",\"ARM64\"]') || (matrix.os) == 'macos-15-intel' && fromJSON('[\"self-hosted\",\"macOS\",\"x64\"]') || (matrix.os) == 'windows-2022' && fromJSON('[\"self-hosted\",\"windows\",\"x64\"]') || (matrix.os) == 'ubuntu-22.04' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (matrix.os) }}"
     # Priced for a COLD `uv sync`, on every platform.
     #
     # The previous split (Windows 25, Linux/macOS 10) came from a warm-cache
